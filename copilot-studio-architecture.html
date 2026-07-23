@@ -1,0 +1,490 @@
+<title>Copilot Studio — Enterprise Architecture in Diagrams</title>
+<style>
+  :root {
+    --paper: #F4F2F9;
+    --card: #FBFAFE;
+    --sheet: #FCFBF7;
+    --ink: #201A2B;
+    --ink-soft: #4A4360;
+    --muted: #736C89;
+    --line: #E0DCEC;
+    --line-strong: #CFC9E0;
+    --accent: #6A4CFF;
+    --accent-soft: #EEE9FF;
+    --teal: #0F9E8E;
+    --amber: #B4780A;
+    --shadow: 0 1px 2px rgba(32,26,43,.05), 0 8px 24px -12px rgba(32,26,43,.18);
+    --mono: ui-monospace, "Cascadia Code", "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #14111C;
+      --card: #1C1826;
+      --sheet: #FBFAF5;
+      --ink: #ECE8F5;
+      --ink-soft: #B7B0C9;
+      --muted: #8B84A3;
+      --line: #2C2739;
+      --line-strong: #3A3450;
+      --accent: #9A82FF;
+      --accent-soft: #241E3A;
+      --teal: #35C2B1;
+      --amber: #D79A2B;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #F4F2F9; --card: #FBFAFE; --sheet: #FCFBF7; --ink: #201A2B; --ink-soft: #4A4360;
+    --muted: #736C89; --line: #E0DCEC; --line-strong: #CFC9E0; --accent: #6A4CFF; --accent-soft: #EEE9FF;
+    --teal: #0F9E8E; --amber: #B4780A; --shadow: 0 1px 2px rgba(32,26,43,.05), 0 8px 24px -12px rgba(32,26,43,.18);
+  }
+  :root[data-theme="dark"] {
+    --paper: #14111C; --card: #1C1826; --sheet: #FBFAF5; --ink: #ECE8F5; --ink-soft: #B7B0C9;
+    --muted: #8B84A3; --line: #2C2739; --line-strong: #3A3450; --accent: #9A82FF; --accent-soft: #241E3A;
+    --teal: #35C2B1; --amber: #D79A2B; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: clamp(28px, 5vw, 72px) clamp(18px, 4vw, 40px) 80px; }
+
+  /* Header */
+  header { border-bottom: 1px solid var(--line); padding-bottom: 32px; margin-bottom: 40px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin: 0 0 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 2px; background: var(--accent); display: inline-block; }
+  h1 {
+    font-size: clamp(30px, 5.2vw, 50px); line-height: 1.04; letter-spacing: -.02em;
+    font-weight: 800; margin: 0 0 16px; text-wrap: balance; max-width: 18ch;
+  }
+  .dek { font-size: clamp(16px, 2vw, 19px); color: var(--ink-soft); margin: 0; max-width: 62ch; }
+  .meta {
+    margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px 22px;
+    font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+  }
+  .meta b { color: var(--ink-soft); font-weight: 600; }
+
+  /* Phase strip */
+  .phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 48px; }
+  .phase {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .phase::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+  .phase .k { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .phase h3 { margin: 6px 0 4px; font-size: 17px; letter-spacing: -.01em; }
+  .phase p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+  .phase.run::before { background: var(--teal); }
+  .phase.wrap::before { background: var(--amber); }
+
+  /* Plates */
+  .plate { margin-bottom: 40px; }
+  .plate-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; flex-wrap: wrap; }
+  .fig {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; white-space: nowrap;
+    border: 1px solid var(--line-strong); border-radius: 999px; padding: 3px 10px;
+  }
+  .plate h2 { font-size: clamp(19px, 2.6vw, 24px); letter-spacing: -.015em; margin: 0; font-weight: 700; }
+  .read { color: var(--ink-soft); font-size: 15px; margin: 8px 0 16px; max-width: 74ch; }
+  .read strong { color: var(--ink); font-weight: 600; }
+
+  .sheet {
+    background: var(--sheet);
+    background-image:
+      linear-gradient(rgba(106,76,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(106,76,255,.05) 1px, transparent 1px);
+    background-size: 22px 22px;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 24px 20px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .sheet pre.mermaid {
+    margin: 0; background: transparent; min-width: 520px; display: flex; justify-content: center;
+    font-family: var(--mono);
+  }
+  .note {
+    margin-top: 14px; font-size: 13.5px; color: var(--muted); border-left: 2px solid var(--line-strong);
+    padding-left: 14px; max-width: 76ch;
+  }
+  .note b { color: var(--ink-soft); }
+
+  footer { margin-top: 60px; padding-top: 26px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  footer p { margin: 0 0 8px; max-width: 78ch; }
+  footer .src { font-family: var(--mono); font-size: 12px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Theme toggle */
+  .toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 10;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    background: var(--card); color: var(--ink-soft); border: 1px solid var(--line-strong);
+    border-radius: 999px; padding: 8px 14px; cursor: pointer; box-shadow: var(--shadow);
+  }
+  .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 560px) { .meta { gap: 8px 16px; } }
+</style>
+
+<button class="toggle" id="themeToggle" aria-label="Toggle light or dark theme">◐ Theme</button>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Microsoft Copilot Studio</p>
+    <h1>Enterprise architecture, in diagrams</h1>
+    <p class="dek">A visual map of how Copilot Studio agents are built, how they run, and how an enterprise wraps identity, governance, ALM, and cost around them. Nine schematic plates, read as a set.</p>
+    <div class="meta">
+      <span><b>Compiled</b> 2026-07-23</span>
+      <span><b>Source</b> Microsoft Learn + local knowledge base</span>
+      <span><b>Scope</b> classic + generative orchestration</span>
+    </div>
+  </header>
+
+  <section class="phases" aria-label="Three ways to read the diagrams">
+    <div class="phase build">
+      <div class="k">Build time</div>
+      <h3>Author &amp; promote</h3>
+      <p>Components authored as YAML, versioned in Git, promoted through environments. Plates 02, 06.</p>
+    </div>
+    <div class="phase run">
+      <div class="k">Run time</div>
+      <h3>Plan &amp; respond</h3>
+      <p>The orchestrator plans each turn — grounds, calls tools, delegates, moderates, summarizes. Plates 03, 04.</p>
+    </div>
+    <div class="phase wrap">
+      <div class="k">Enterprise wrap</div>
+      <h3>Govern &amp; scale</h3>
+      <p>Identity, DLP, managed environments, monitoring, multi-agent, channels, cost. Plates 01, 05, 07–09.</p>
+    </div>
+  </section>
+
+  <!-- PLATE 01 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 01</span><h2>The enterprise platform stack</h2></div>
+    <p class="read"><strong>Read this as layers.</strong> Everything an agent does rests on Entra ID (identity), Dataverse (storage), and Power Platform (governance). Governance is not a layer — it wraps all of them.</p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace','flowchart':{'curve':'basis'}}}%%
+flowchart TB
+  subgraph L6["SURFACES / CHANNELS"]
+    direction LR
+    Teams["Teams and M365 Copilot"]
+    Web["Web / Direct Line"]
+    Wapp["WhatsApp"]
+    Tel["Telephony / voice"]
+  end
+  subgraph L5["COPILOT STUDIO AGENT"]
+    direction LR
+    Instr["Instructions"]
+    Know["Knowledge"]
+    Tools["Tools and Skills"]
+    Topics["Topics"]
+    Trig["Triggers"]
+    Sub["Child / Connected agents"]
+  end
+  subgraph L4["ORCHESTRATION RUNTIME"]
+    direction LR
+    Planner["Generative orchestrator"]
+    Classic["Classic orchestrator"]
+    Mod["Content moderation"]
+  end
+  subgraph L3["MODELS"]
+    direction LR
+    GPT["GPT / reasoning models"]
+    STS["Real-time speech-to-speech"]
+  end
+  subgraph L2["INTEGRATION"]
+    direction LR
+    Conn["Connectors"]
+    Flows["Power Automate / Agent flows"]
+    MCP["MCP servers"]
+    REST["REST / HTTP"]
+    A2A["A2A / Foundry / Fabric / SDK"]
+  end
+  subgraph L1["FOUNDATION — MICROSOFT CLOUD"]
+    direction LR
+    Entra["Microsoft Entra ID"]
+    DV["Dataverse"]
+    PP["Power Platform"]
+    Graph["Microsoft 365 / Graph"]
+  end
+  L6 --> L5 --> L4 --> L3
+  L5 --> L2
+  L4 --> L2
+  L2 --> L1
+  L5 --> L1
+  Gov["GOVERNANCE and SECURITY — DLP, Managed Environments, Purview, Sentinel, CMK"]
+  Gov -. "wraps all layers" .-> L5
+  Gov -.-> L2
+  Gov -.-> L1
+</pre>
+    </div>
+  </section>
+
+  <!-- PLATE 02 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 02</span><h2>Anatomy of a single agent</h2></div>
+    <p class="read"><strong>Read this as a parts list.</strong> An agent is these components. Under generative orchestration the planner routes across them using their <strong>names and descriptions</strong> — which is why descriptions are the real source code.</p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace','flowchart':{'curve':'basis'}}}%%
+flowchart LR
+  Agent(("AGENT"))
+  Agent --> I["Instructions — identity, scope, rules"]
+  Agent --> K["Knowledge — RAG grounding"]
+  Agent --> T["Tools and Skills — actions"]
+  Agent --> TP["Topics — deterministic dialog"]
+  Agent --> TR["Triggers — when it activates"]
+  Agent --> M["Model — reasoning LLM"]
+  Agent --> S["Child / Connected agents"]
+  Agent --> MEM["Memory — per-user, preview"]
+  K --> K2["SharePoint / OneDrive"]
+  K --> K3["Dataverse tables"]
+  K --> K4["Graph connectors"]
+  K --> K1["Public web / Bing"]
+  T --> T1["Power Automate / Agent flow"]
+  T --> T2["Prompt tool"]
+  T --> T3["Connector / Custom connector"]
+  T --> T4["REST API"]
+  T --> T5["MCP server"]
+  T --> T6["Computer Use / CUA"]
+</pre>
+    </div>
+  </section>
+
+  <!-- PLATE 03 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 03</span><h2>Runtime flow — generative orchestration</h2></div>
+    <p class="read"><strong>Read this as one user turn.</strong> The planner reads instructions + descriptions, builds a plan, grounds and acts in parallel, moderates, then summarizes a cited answer. The activity map exposes this path when testing.</p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace'}}%%
+sequenceDiagram
+  actor U as User
+  participant CH as Channel
+  participant AU as Entra ID
+  participant OR as Orchestrator
+  participant LLM as Model
+  participant KN as Knowledge
+  participant TL as Tools
+  participant SA as Connected agents
+  participant MD as Moderation
+  U->>CH: Message or event trigger
+  CH->>AU: Authenticate (SSO)
+  AU-->>CH: Identity + token
+  CH->>OR: Intent + conversation history
+  OR->>LLM: Build plan from instructions + descriptions
+  LLM-->>OR: Plan (knowledge / tools / topics / agents)
+  par Ground and act
+    OR->>KN: Retrieve (trimmed to user access)
+    KN-->>OR: Passages + citations
+  and
+    OR->>TL: Call tools with AI-filled inputs
+    TL-->>OR: Results
+  and
+    OR->>SA: Delegate task
+    SA-->>OR: Findings only
+  end
+  OR->>MD: Moderate
+  OR->>LLM: Summarize grounded response
+  LLM-->>OR: Answer + citations
+  OR-->>CH: Response
+  CH-->>U: Answer
+</pre>
+    </div>
+    <p class="note"><b>Cost note:</b> the planner reasons every turn, so generative orchestration costs more credits than a classic topic-trigger match. Use classic for high-volume, predictable intents.</p>
+  </section>
+
+  <!-- PLATE 04 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 04</span><h2>Knowledge &amp; RAG pipeline</h2></div>
+    <p class="read"><strong>Read this as grounding.</strong> Sources are indexed, retrieved (description-filtered past 25 sources), <strong>security-trimmed to the asking user</strong>, then generated. No citation + ungrounded off = the answer is withheld.</p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace','flowchart':{'curve':'basis'}}}%%
+flowchart LR
+  S1["Public websites"] --> IDX
+  S2["SharePoint / OneDrive"] --> IDX
+  S3["Dataverse tables"] --> IDX
+  S4["Graph connectors"] --> IDX
+  S5["Uploaded files"] --> IDX
+  IDX["Index / semantic index"] --> RET
+  Q["User question"] --> RET["Retrieve (filtered if over 25 sources)"]
+  RET --> TRIM["Security trimming — user sees only permitted data"]
+  TRIM --> GEN["Generate grounded answer"]
+  GEN --> CITE{"Has citation?"}
+  CITE -- yes --> OUT["Answer + citations"]
+  CITE -- "no, ungrounded off" --> FB["Withheld — fallback topic fires"]
+</pre>
+    </div>
+  </section>
+
+  <!-- PLATE 05 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 05</span><h2>Multi-agent topology — hub &amp; spoke</h2></div>
+    <p class="read"><strong>Read this as delegation.</strong> A lean orchestrator routes to independently-owned domain agents. Only the orchestrator talks to the user; sub-agents return findings. Split past ~30–40 combined choices.</p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace','flowchart':{'curve':'basis'}}}%%
+flowchart TB
+  U["Employee / customer"] --> OA["Orchestrator agent — routing only"]
+  OA -->|"HR intent"| HR["HR Agent"]
+  OA -->|"IT intent"| IT["IT Support Agent"]
+  OA -->|"Finance intent"| FIN["Finance Agent"]
+  OA -->|"low confidence"| HUM["Human escalation"]
+  HR --> HRK["SharePoint HR policies"]
+  IT --> ITK["Dataverse + ServiceNow"]
+  FIN --> FBK["Fabric Data agent"]
+  OA -. "A2A / SDK / Foundry" .-> EXT["External agents"]
+</pre>
+    </div>
+    <p class="note"><b>Trade-off:</b> each hop adds latency and credits. Keep the parent a router, not an executor — don't duplicate sub-agent capability in the parent.</p>
+  </section>
+
+  <!-- PLATE 06 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 06</span><h2>ALM &amp; the code-first dev loop</h2></div>
+    <p class="read"><strong>Read this as the pipeline.</strong> Clone to VS Code, edit YAML, validate, commit. Apply to DEV to test; gate promotion on test sets via solutions + pipelines. <strong>Apply is not Publish.</strong></p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace','flowchart':{'curve':'basis'}}}%%
+flowchart LR
+  subgraph Local["DEVELOPER — VS CODE"]
+    Clone["Clone agent (.mcs.yml)"] --> Edit["Edit YAML (AI-assisted)"]
+    Edit --> Val["Validate — schema, IDs, Power Fx"]
+    Val --> Git["Git commit / PR"]
+  end
+  subgraph Dev["DEV"]
+    Apply["Apply → test pane"] --> Eval["Evaluate — test sets"]
+  end
+  subgraph Test["TEST"]
+    Kit["Agent Kit — batch tests + rubrics"]
+  end
+  subgraph Prod["PROD"]
+    Pub["Publish → channels"]
+    Mon["Monitor / Analytics"]
+  end
+  Git --> Apply
+  Eval -->|"solution"| Pipe["Power Platform Pipelines"]
+  Pipe --> Kit
+  Kit -->|"pass"| Pub
+  Mon -->|"real convos become test cases"| Eval
+</pre>
+    </div>
+    <p class="note"><b>Per-environment:</b> DLP policies, connection references, and environment variables rebind on each hop — solutions and pipelines handle this.</p>
+  </section>
+
+  <!-- PLATE 07 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 07</span><h2>Governance &amp; security layers</h2></div>
+    <p class="read"><strong>Read this as the wrap.</strong> Four control planes surround every agent: identity, data controls, environment governance, and audit/monitoring.</p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace','flowchart':{'curve':'basis'}}}%%
+flowchart TB
+  Agent(("AGENT"))
+  Agent --- ID["IDENTITY — Entra ID auth, cert, tool creds (end-user vs maker)"]
+  Agent --- DC["DATA CONTROLS — DLP policies, endpoint filtering, sensitivity labels, CMK"]
+  Agent --- EG["ENVIRONMENT — Managed Environments, routing, security scan"]
+  Agent --- OB["AUDIT — Purview logs, Sentinel alerts, App Insights, CoE / Agent Inventory"]
+</pre>
+    </div>
+  </section>
+
+  <!-- PLATE 08 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 08</span><h2>Channels &amp; surfaces</h2></div>
+    <p class="read"><strong>Read this as reach.</strong> One published agent, many surfaces — each renders differently (Teams caps cards/citations; telephony is voice-only).</p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace','flowchart':{'curve':'basis'}}}%%
+flowchart LR
+  Agent(("PUBLISHED AGENT"))
+  Agent --> Teams["Microsoft Teams"]
+  Agent --> M365["Microsoft 365 Copilot"]
+  Agent --> Webc["Custom website / Web Chat"]
+  Agent --> DL["Direct Line — custom apps"]
+  Agent --> SP["SharePoint"]
+  Agent --> WA["WhatsApp"]
+  Agent --> Tele["Telephony — ACS / D365 Contact Center"]
+  Agent --> ABS["Azure Bot Service — Slack, Telegram, Email"]
+</pre>
+    </div>
+  </section>
+
+  <!-- PLATE 09 -->
+  <section class="plate">
+    <div class="plate-head"><span class="fig">Plate 09</span><h2>Cost model — Copilot Credits</h2></div>
+    <p class="read"><strong>Read this as the meter.</strong> Each turn can stack meters; all draw on one tenant pool. Cross 125% of prepaid capacity and agents are disabled — unless the environment is pay-as-you-go.</p>
+    <div class="sheet">
+<pre class="mermaid">
+%%{init: {'theme':'neutral','fontFamily':'Consolas, ui-monospace, monospace','flowchart':{'curve':'basis'}}}%%
+flowchart LR
+  Turn["One agent turn"] --> C1["Classic answer = 1"]
+  Turn --> C2["Generative answer = 2"]
+  Turn --> C3["Agent action / CUA step = 5"]
+  Turn --> C4["Tenant graph grounding = 10"]
+  Turn --> C5["Agent flow = 13 per 100 actions"]
+  Turn --> C6["AI tools = 1 / 15 / 100"]
+  C1 --> Pool["Tenant credit pool"]
+  C2 --> Pool
+  C3 --> Pool
+  C4 --> Pool
+  C5 --> Pool
+  C6 --> Pool
+  Pool --> OVR{"Over 125% of prepaid?"}
+  OVR -- yes --> Block["Agents disabled — unless pay-as-you-go"]
+  OVR -- no --> Run["Runs normally"]
+</pre>
+    </div>
+  </section>
+
+  <footer>
+    <p>Companion to the local knowledge base (<span class="src">knowledge-base/reference/architecture-diagrams.md</span>). Diagrams synthesize Microsoft Learn documentation for Copilot Studio; verify specifics against current product behavior, as the platform ships monthly and several features are in preview.</p>
+    <p class="src">Build time → plates 02, 06 · Run time → plates 03, 04 · Enterprise wrap → plates 01, 05, 07–09</p>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeToggle');
+    btn.addEventListener('click', function () {
+      var root = document.documentElement;
+      var current = root.getAttribute('data-theme');
+      if (!current) {
+        current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    });
+  })();
+</script>
+
+<!-- Mermaid loader: renders the diagrams when this file is opened directly in a browser.
+     Inside the Artifact runtime, Mermaid is already injected (and this CDN import is blocked
+     by CSP), so the guard below prevents any double-rendering. -->
+<script>
+  window.addEventListener('load', function () {
+    // If something already rendered the diagrams (e.g. the Artifact runtime), do nothing.
+    if (document.querySelector('.mermaid svg')) return;
+    var s = document.createElement('script');
+    s.type = 'module';
+    s.textContent =
+      "import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';\n" +
+      "mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });";
+    document.body.appendChild(s);
+  });
+</script>
